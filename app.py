@@ -133,6 +133,11 @@ class Formulario(tk.Toplevel):
         self.geometry(f"+{max(x, 0)}+{max(y, 0)}")
         self.grab_set()              # bloqueia a janela de trás (modal)
         primeiro_campo.focus_set()
+        # Seleciona o valor inicial (ex.: o "1" da quantidade): o que o usuário
+        # digitar SUBSTITUI o valor, em vez de virar "15" ou "51".
+        # Problema encontrado no percurso cognitivo (relatório, seção 6.5).
+        primeiro_campo.select_range(0, "end")
+        primeiro_campo.icursor("end")
 
     def confirmar(self):
         try:

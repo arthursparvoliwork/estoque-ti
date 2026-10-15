@@ -40,7 +40,7 @@ TAREFAS = {
         ("localizar 'Mouse USB' na tabela", "M"),
         ("duplo clique na linha (abre a saída já com o item)", "PBBBB"),
         ("mão no teclado", "H"),
-        ("apagar o '1' e digitar '2'", "KK"),
+        ("digitar '2' (o '1' já vem selecionado)", "K"),
         ("Recepção já é o setor padrão; Tab, Tab até responsável", "MKK"),
         ("digitar o próprio nome (6 letras)", "K" * 6),
         ("conferir e confirmar com Enter", "MK"),
@@ -55,7 +55,7 @@ TAREFAS = {
         ("localizar o toner na tabela", "M"),
         ("clicar na linha", "PBB"),
         ("clicar em '↓ Entrada'", "PBB"),
-        ("mão no teclado, apagar o '1' e digitar '5'", "HKK"),
+        ("mão no teclado e digitar '5' (substitui o '1')", "HK"),
         ("conferir e confirmar com Enter", "MK"),
     ],
     "T5 Ler relatório": [
