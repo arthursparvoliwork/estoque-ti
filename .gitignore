@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.tmp
+# dados de uso local (não versionar dados reais do hospital)
+dados_estoque.json
+dados_inicio.json
+uso_log.csv

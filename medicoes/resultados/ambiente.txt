@@ -1,0 +1,4 @@
+Sistema operacional: Linux 6.18.44-fc-v114
+Processador: x86_64
+Python: 3.13.16
+Data: 15/10/2026 15:53
