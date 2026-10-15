@@ -208,13 +208,13 @@ deslizando para a esquerda até achar o lugar dela.
 **A otimização que o benchmark revelou (é o destaque do seu relatório):**
 
 Na versão 1, `normalizar()` (tirar os acentos, que é cara) era chamada **dentro do
-`while`**, a cada comparação. Com 1.000 itens, isso dava ~250 mil chamadas.
-O benchmark mediu **421 ms**, acima da meta de 100 ms. Como a tabela da tela
+`while`**, a cada comparação. Com 1.000 itens, isso dava ~500 mil chamadas (duas por comparação).
+O benchmark mediu **mais de 400 ms**, acima da meta de 100 ms. Como a tabela da tela
 reordena a cada tecla digitada na busca, o programa travaria.
 
 A versão 2 calcula a chave **uma vez por item, antes do laço** (a lista `pares`).
-O algoritmo é o mesmo, mas caiu para **~38 ms: 11x mais rápido**
-(veja `grafico_otimizacao.png`).
+O algoritmo é o mesmo, mas caiu para **~36 ms: mais de 10x mais rápido**
+(veja `grafico_otimizacao.png`, que o benchmark gera medindo as duas versões na mesma máquina).
 
 **Lição de sênior #4:** *meça antes de otimizar*. Sem o benchmark, ninguém
 teria notado o problema, porque com os 12 itens de exemplo leva 0,5 ms.

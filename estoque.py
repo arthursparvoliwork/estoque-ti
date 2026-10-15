@@ -117,7 +117,7 @@ def ordenar_insercao(itens: list[Item], chave: str = "codigo",
     Otimização (versão 2): a chave de cada item (ex.: nome sem acento)
     é calculada UMA vez antes do laço, e não a cada comparação.
     Na versão 1, normalizar() rodava dentro do while: com 1.000 itens
-    isso eram ~250 mil chamadas e a ordenação levava ~420 ms."""
+    isso eram ~500 mil chamadas e a ordenação passava de 400 ms."""
     # pares (chave já calculada, item)
     pares = [(_valor_ordenacao(item, chave), item) for item in itens]
     for i in range(1, len(pares)):
