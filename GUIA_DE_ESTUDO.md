@@ -13,14 +13,17 @@ estoque-ti/
 ├── estoque.py          ← NÚCLEO: regras de negócio (não sabe que existe tela)
 ├── app.py              ← INTERFACE: Tkinter (só mostra e lê dados)
 ├── testes/
-│   └── test_estoque.py ← 24 testes automáticos do núcleo
+│   ├── test_estoque.py ← 25 testes automáticos do núcleo
+│   └── bot_e2e.py      ← bot que usa a janela (teste ponta a ponta)
 ├── medicoes/
 │   ├── benchmark.py    ← mede DESEMPENHO e gera gráficos
+│   ├── teste_carga.py  ← 50 bots, 10 mil operações (teste de carga)
 │   └── resultados/     ← CSV + PNG que vão para o relatório
 ├── usabilidade/
 │   ├── ROTEIRO_TESTE.md, QUESTIONARIO_SUS.md
 │   ├── respostas_sus.csv, logs/   ← você preenche com dados reais
-│   └── analisar_usabilidade.py    ← calcula SUS e gera gráficos
+│   ├── analisar_usabilidade.py    ← calcula SUS e gera gráficos
+│   └── klm.py          ← estima tempo das tarefas (método KLM)
 ├── dados_estoque.json  ← criado ao usar (é o "banco de dados")
 └── uso_log.csv         ← criado ao usar (tempo de cada tarefa)
 ```
@@ -168,21 +171,48 @@ O teste `test_busca_binaria_recursiva_concorda_com_iterativa` prova que as duas
 versões dão o mesmo resultado. **Lição de sênior #3:** quando você tem duas
 implementações da mesma coisa, teste uma contra a outra.
 
-### 1.6 `soma_recursiva()`
+### 1.6 `soma_recursiva()` (e o bug que os bots acharam)
 
+**Versão 1 (com bug):**
 ```python
-if not valores:          # lista vazia -> caso base
+if not valores:
     return 0
 return valores[0] + soma_recursiva(valores[1:])
 ```
+soma([3, 5, 2]) = 3 + soma([5, 2]) = 3 + 5 + soma([2]) = 3 + 5 + 2 + soma([]) = 10.
 
-soma([3, 5, 2]) = 3 + soma([5, 2]) = 3 + (5 + soma([2])) = 3 + 5 + 2 + soma([]) = 10.
+O problema: **uma chamada por elemento**. O Python limita a pilha de chamadas
+a ~1.000 níveis. Com mais de ~1.000 saídas registradas, o relatório dava
+`RecursionError` e travava. Com 12 itens de exemplo isso nunca aparecia. Quem
+achou foi o **teste de carga com bots** (seção 4.2), depois de alguns milhares
+de operações.
 
-Seja honesto se o professor perguntar: **em produção ninguém faria isso**.
-`sum()` é mais rápido, e `valores[1:]` copia a lista a cada chamada (O(n²)
-de memória). Ela existe para cobrir o tópico "funções recursivas" da ementa com um
-exemplo didático. Saber dizer *"isso é didático, em produção eu usaria X porque Y"*
-mostra maturidade.
+**Versão 2 (dividir para conquistar):**
+```python
+def soma_recursiva(valores, inicio=0, fim=None):
+    if fim is None:
+        fim = len(valores)
+    if fim - inicio == 0:            # caso base: trecho vazio
+        return 0
+    if fim - inicio == 1:            # caso base: um elemento
+        return valores[inicio]
+    meio = (inicio + fim) // 2
+    return (soma_recursiva(valores, inicio, meio) +     # metade esquerda
+            soma_recursiva(valores, meio, fim))         # metade direita
+```
+
+soma([3, 5, 2, 4]) = soma([3, 5]) + soma([2, 4]) = (3 + 5) + (2 + 4) = 14.
+
+- Continua recursiva, como a ementa pede, mas a profundidade virou **log₂ n**:
+  100.000 elementos = ~17 níveis, em vez de 100.000.
+- Usa índices (`inicio`, `fim`) em vez de `valores[1:]`, então não copia a lista a cada chamada.
+- O teste `test_soma_recursiva_lista_grande_nao_estoura_pilha` soma 100 mil
+  números. Ele **falhava** antes da correção e passa depois. Isso é um
+  **teste de regressão**: garante que o bug nunca volta.
+
+**Lição de sênior:** o jeito certo de corrigir um bug é (1) escrever um teste que
+reproduz o bug e ver ele **falhar**, (2) corrigir, (3) ver o teste **passar**.
+Assim você prova que corrigiu, e não apenas acha que corrigiu.
 
 ### 1.7 Insertion sort (e a otimização)
 
@@ -383,7 +413,28 @@ sort com segurança. Mudei o algoritmo, rodei os 24 testes, todos passaram, e eu
 - O insertion sort só roda até 5.000 itens, porque com 20.000 levaria minutos.
   Isso por si só já é um resultado: O(n²) não escala.
 
-### 4.2 `usabilidade/analisar_usabilidade.py` (usabilidade)
+### 4.2 `medicoes/teste_carga.py` (os bots)
+
+- 50 objetos `Bot`, cada um faz 200 operações sorteadas com **pesos**
+  (`random.choices`): buscar é mais comum que cadastrar, igual na vida real.
+- A `fila` embaralhada intercala os bots, como 50 pessoas usando ao mesmo tempo.
+- Toda alteração chama `salvar()`, igual à interface.
+- Mede **percentis**: o p95 é o tempo em que 95% das operações terminaram.
+  A média esconde os casos lentos. Empresas medem p95/p99.
+- `except ErroEstoque` → "recusada": a regra funcionou (saída maior que o saldo).
+  `except Exception` → **bug**. Foram esses que revelaram o `RecursionError`.
+- `checar_invariantes()`: ao final confere 5 regras (sem saldo negativo, histórico
+  bate com o saldo, lista ordenada, códigos únicos, arquivo = memória).
+
+### 4.3 `testes/bot_e2e.py` e `usabilidade/klm.py`
+
+- O bot E2E abre a janela de verdade e faz as 5 tarefas. Rode sem `rapido` e
+  **assista o bot trabalhando**. O `yield` devolve o controle para a janela
+  se redesenhar entre um passo e outro.
+- O KLM soma tempos-padrão de operadores (K tecla, P apontar, B clique,
+  H mão no teclado, M pensar) para estimar o tempo de um usuário experiente.
+
+### 4.4 `usabilidade/analisar_usabilidade.py` (usabilidade com pessoas)
 
 - `nota_sus()` implementa a fórmula de Brooke: ímpares `resposta − 1`,
   pares `5 − resposta`, soma × 2,5.
@@ -399,8 +450,8 @@ sort com segurança. Mudei o algoritmo, rodei os 24 testes, todos passaram, e eu
    O(n²). Usei para cumprir a ementa; o benchmark mostra que `sorted()` é ~700x
    mais rápido com 5.000 itens. Em produção usaria `sorted()`.
 3. **O que acontece se a luz acabar na hora de salvar?** → escrita atômica (1.10).
-4. **Como você garantiu que o sistema funciona?** → 24 testes automatizados +
-   teste com usuários reais.
+4. **Como você garantiu que o sistema funciona?** → 25 testes unitários, bot
+   ponta a ponta (7/7) e teste de carga com 10 mil operações sem inconsistência.
 5. **Qual a diferença entre desempenho e usabilidade na ISO 25010?** →
    desempenho é sobre o *sistema* (tempo, recursos). Usabilidade é sobre a
    *interação com pessoas* (aprender, operar, errar menos, satisfação).

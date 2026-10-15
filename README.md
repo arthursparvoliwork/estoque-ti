@@ -28,18 +28,21 @@ Requer Python 3.10+ (o Tkinter já vem no instalador oficial do Windows).
 python app.py
 ```
 
-Testes automatizados (24 testes):
+Testes automatizados:
 
 ```bash
-python -m unittest discover -s testes -v
+python -m unittest discover -s testes -v   # 25 testes unitários do núcleo
+python testes/bot_e2e.py                   # bot executa as 5 tarefas na janela
 ```
 
 Medições de desempenho e análise de usabilidade (precisam do matplotlib):
 
 ```bash
 pip install -r requirements.txt
-python medicoes/benchmark.py
-python usabilidade/analisar_usabilidade.py
+python medicoes/benchmark.py              # desempenho por tamanho de estoque
+python medicoes/teste_carga.py            # 50 bots, 10.000 operações
+python usabilidade/klm.py                 # estimativa de tempo das tarefas (KLM)
+python usabilidade/analisar_usabilidade.py  # SUS, depois do teste com pessoas
 ```
 
 ## Arquitetura
@@ -48,9 +51,10 @@ python usabilidade/analisar_usabilidade.py
 |---|---|
 | `estoque.py` | Regras de negócio, sem nenhuma dependência de interface |
 | `app.py` | Interface Tkinter, que chama o núcleo |
-| `testes/` | Testes unitários do núcleo |
-| `medicoes/` | Benchmark de desempenho (ISO/IEC 25010) |
-| `usabilidade/` | Roteiro, questionário SUS e análise do teste com usuários |
+| `testes/` | Testes unitários do núcleo e bot ponta a ponta |
+| `medicoes/` | Benchmark e teste de carga (ISO/IEC 25010) |
+| `usabilidade/` | KLM, roteiro, questionário SUS e análise do teste com usuários |
+| `relatorio/` | Relatório do Projeto Integrador (.docx) |
 
 Conteúdos aplicados: registros (`dataclass`), vetores e arranjos de registros,
 pesquisa sequencial e binária (iterativa e recursiva), ordenação por inserção,

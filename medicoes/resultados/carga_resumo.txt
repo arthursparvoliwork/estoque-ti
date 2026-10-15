@@ -1,0 +1,13 @@
+Bots: 50 | operações: 10000 | duração: 91.6 s | vazão: 109 op/s
+Estoque final: 1296 itens, 4621 movimentações
+Erros inesperados (bugs): 0
+Invariantes violadas: 0 
+
+operação         qtd  recus.      p50      p95      p99      máx   ≤100ms
+buscar_nome     3072       0     2.14     4.40     5.89    28.21   100.0%
+buscar_codigo   1049       0     0.02     0.04     0.07     1.81   100.0%
+saida           2459     527    10.64    27.21    37.93    44.57   100.0%
+entrada         1454       0    14.19    28.33    39.21    48.21   100.0%
+relatorio        970       0    15.95    41.43    54.06    65.35   100.0%
+cadastrar        996       0    16.53    33.74    46.43    57.90   100.0%
+TODAS          10000     527     4.48    28.36    40.48    65.35   100.0%

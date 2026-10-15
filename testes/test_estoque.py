@@ -36,7 +36,14 @@ class TestFuncoesAuxiliares(unittest.TestCase):
 
     def test_soma_recursiva(self):
         self.assertEqual(soma_recursiva([]), 0)
+        self.assertEqual(soma_recursiva([7]), 7)
         self.assertEqual(soma_recursiva([1, 2, 3, 4]), 10)
+
+    def test_soma_recursiva_lista_grande_nao_estoura_pilha(self):
+        # Bug encontrado pelo teste de carga: com ~1.000 saídas a versão
+        # antiga dava RecursionError e o relatório travava.
+        valores = list(range(100_000))
+        self.assertEqual(soma_recursiva(valores), sum(valores))
 
     def test_ordenar_insercao_nao_altera_original(self):
         itens = [Item("C", "c", "Outro", 3, 0), Item("A", "a", "Outro", 1, 0),

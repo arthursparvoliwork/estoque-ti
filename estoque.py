@@ -82,12 +82,26 @@ def gerar_codigo(categoria: str, numero: int) -> str:
 # ---------------------------------------------------------------------------
 # FUNÇÕES RECURSIVAS
 # ---------------------------------------------------------------------------
-def soma_recursiva(valores: list[int]) -> int:
-    """Soma uma lista sem usar laço: soma(lista) = primeiro + soma(resto).
-    Caso base: lista vazia soma 0."""
-    if not valores:
+def soma_recursiva(valores: list[int], inicio: int = 0,
+                   fim: int | None = None) -> int:
+    """Soma recursiva por DIVIDIR PARA CONQUISTAR:
+    soma(lista) = soma(metade esquerda) + soma(metade direita).
+
+    Versão 1 (com bug) era: valores[0] + soma_recursiva(valores[1:]).
+    Ela fazia UMA chamada por elemento: com ~1.000 saídas registradas
+    estourava o limite de recursão do Python (RecursionError) e o
+    relatório travava. Bug encontrado pelo teste de carga com bots.
+    Agora a profundidade é log2(n): 100 mil elementos = ~17 níveis.
+    Usar índices (inicio/fim) também evita copiar a lista a cada chamada."""
+    if fim is None:
+        fim = len(valores)
+    if fim - inicio == 0:                 # caso base: trecho vazio
         return 0
-    return valores[0] + soma_recursiva(valores[1:])
+    if fim - inicio == 1:                 # caso base: um elemento
+        return valores[inicio]
+    meio = (inicio + fim) // 2
+    return (soma_recursiva(valores, inicio, meio) +
+            soma_recursiva(valores, meio, fim))
 
 
 def busca_binaria_recursiva(itens: list[Item], codigo: str,
