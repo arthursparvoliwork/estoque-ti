@@ -176,7 +176,7 @@ const capa = [
   centro([tc("CURSO DE ENGENHARIA DE SOFTWARE", { bold: true })]),
   centro([tc("PROJETO INTEGRADOR: LABORATÓRIO DE PROGRAMAÇÃO", { bold: true })]),
   centro([tc(AUTOR)], { before: 1700 }),
-  centro([tc("RA: "), realce("[preencher]"), tc("   Turma: "), realce("[preencher]")]),
+  centro([tc("RA: 5742447   Turma: B")]),
   centro([tc(`${TITULO}:`, { bold: true })], { before: 2400 }),
   centro([tc(SUBTITULO)]),
   centro([tc("Professor: Danilo Cardenuto Ferreira")], { before: 1200 }),
